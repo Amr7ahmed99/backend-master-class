@@ -18,7 +18,7 @@ CREATE TABLE "transfers" (
   "owner" varchar NOT NULL,
   "from_account_id" bigint NOT NULL,
   "to_account_id" bigint NOT NULL,
-  "ammount" bigint NOT NULL,
+  "amount" bigint NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
@@ -36,4 +36,4 @@ COMMENT ON COLUMN "entries"."amount" IS 'can be negative or positive';
 
 ALTER TABLE "entries" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
 
-ALTER TABLE "transfers" ADD FOREIGN KEY ("ammount") REFERENCES "accounts" ("id");
+ALTER TABLE "transfers" ADD FOREIGN KEY ("amount") REFERENCES "accounts" ("id");
