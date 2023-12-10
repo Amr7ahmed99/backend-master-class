@@ -4,7 +4,8 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListAccount :many
 SELECT * FROM "accounts"
-ORDER BY id;
+ORDER BY id
+LIMIT $1;
 
 -- name: CreateAccount :one
 INSERT INTO "accounts" (
@@ -16,3 +17,9 @@ INSERT INTO "accounts" (
 -- name: DeleteAccount :exec
 DELETE FROM "accounts"
 WHERE id = $1;
+
+-- name: UpdateAccount :one
+UPDATE accounts
+SET balance= $2, currency= $3
+WHERE id= $1
+RETURNING *;

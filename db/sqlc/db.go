@@ -60,6 +60,15 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listTransfersStmt, err = db.PrepareContext(ctx, listTransfers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListTransfers: %w", err)
 	}
+	if q.updateAccountStmt, err = db.PrepareContext(ctx, updateAccount); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateAccount: %w", err)
+	}
+	if q.updateEntryStmt, err = db.PrepareContext(ctx, updateEntry); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateEntry: %w", err)
+	}
+	if q.updateTransferStmt, err = db.PrepareContext(ctx, updateTransfer); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateTransfer: %w", err)
+	}
 	return &q, nil
 }
 
@@ -125,6 +134,21 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listTransfersStmt: %w", cerr)
 		}
 	}
+	if q.updateAccountStmt != nil {
+		if cerr := q.updateAccountStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateAccountStmt: %w", cerr)
+		}
+	}
+	if q.updateEntryStmt != nil {
+		if cerr := q.updateEntryStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateEntryStmt: %w", cerr)
+		}
+	}
+	if q.updateTransferStmt != nil {
+		if cerr := q.updateTransferStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateTransferStmt: %w", cerr)
+		}
+	}
 	return err
 }
 
@@ -176,6 +200,9 @@ type Queries struct {
 	listAccountStmt    *sql.Stmt
 	listEntriesStmt    *sql.Stmt
 	listTransfersStmt  *sql.Stmt
+	updateAccountStmt  *sql.Stmt
+	updateEntryStmt    *sql.Stmt
+	updateTransferStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -194,5 +221,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listAccountStmt:    q.listAccountStmt,
 		listEntriesStmt:    q.listEntriesStmt,
 		listTransfersStmt:  q.listTransfersStmt,
+		updateAccountStmt:  q.updateAccountStmt,
+		updateEntryStmt:    q.updateEntryStmt,
+		updateTransferStmt: q.updateTransferStmt,
 	}
 }
