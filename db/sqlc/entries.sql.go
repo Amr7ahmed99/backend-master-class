@@ -35,7 +35,7 @@ func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry
 }
 
 const deleteEntry = `-- name: DeleteEntry :exec
-DELETE FROM transfers
+DELETE FROM entries
 WHERE id = $1
 `
 
@@ -64,10 +64,11 @@ func (q *Queries) GetEntry(ctx context.Context, id int64) (Entry, error) {
 const listEntries = `-- name: ListEntries :many
 SELECT id, account_id, amount, created_at FROM entries
 ORDER BY id
+LIMIT $1
 `
 
-func (q *Queries) ListEntries(ctx context.Context) ([]Entry, error) {
-	rows, err := q.query(ctx, q.listEntriesStmt, listEntries)
+func (q *Queries) ListEntries(ctx context.Context, limit int32) ([]Entry, error) {
+	rows, err := q.query(ctx, q.listEntriesStmt, listEntries, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -92,4 +93,28 @@ func (q *Queries) ListEntries(ctx context.Context) ([]Entry, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateEntry = `-- name: UpdateEntry :one
+UPDATE entries 
+SET amount= $2
+WHERE id= $1
+RETURNING id, account_id, amount, created_at
+`
+
+type UpdateEntryParams struct {
+	ID     int64 `json:"id"`
+	Amount int64 `json:"amount"`
+}
+
+func (q *Queries) UpdateEntry(ctx context.Context, arg UpdateEntryParams) (Entry, error) {
+	row := q.queryRow(ctx, q.updateEntryStmt, updateEntry, arg.ID, arg.Amount)
+	var i Entry
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.Amount,
+		&i.CreatedAt,
+	)
+	return i, err
 }

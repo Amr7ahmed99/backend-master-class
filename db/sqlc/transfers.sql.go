@@ -75,10 +75,11 @@ func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
 const listTransfers = `-- name: ListTransfers :many
 SELECT id, owner, from_account_id, to_account_id, amount, created_at FROM transfers
 ORDER BY id
+LIMIT $1
 `
 
-func (q *Queries) ListTransfers(ctx context.Context) ([]Transfer, error) {
-	rows, err := q.query(ctx, q.listTransfersStmt, listTransfers)
+func (q *Queries) ListTransfers(ctx context.Context, limit int32) ([]Transfer, error) {
+	rows, err := q.query(ctx, q.listTransfersStmt, listTransfers, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -105,4 +106,40 @@ func (q *Queries) ListTransfers(ctx context.Context) ([]Transfer, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateTransfer = `-- name: UpdateTransfer :one
+UPDATE transfers 
+SET owner= $2, from_account_id= $3, 
+to_account_id= $4, amount= $5
+WHERE id= $1
+RETURNING id, owner, from_account_id, to_account_id, amount, created_at
+`
+
+type UpdateTransferParams struct {
+	ID            int64  `json:"id"`
+	Owner         string `json:"owner"`
+	FromAccountID int64  `json:"from_account_id"`
+	ToAccountID   int64  `json:"to_account_id"`
+	Amount        int64  `json:"amount"`
+}
+
+func (q *Queries) UpdateTransfer(ctx context.Context, arg UpdateTransferParams) (Transfer, error) {
+	row := q.queryRow(ctx, q.updateTransferStmt, updateTransfer,
+		arg.ID,
+		arg.Owner,
+		arg.FromAccountID,
+		arg.ToAccountID,
+		arg.Amount,
+	)
+	var i Transfer
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.FromAccountID,
+		&i.ToAccountID,
+		&i.Amount,
+		&i.CreatedAt,
+	)
+	return i, err
 }
