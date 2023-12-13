@@ -27,6 +27,9 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal("cannot connect to DB", err)
 	}
+
+	defer connectionDB.Close()
+
 	testQueries = New(connectionDB)
 	os.Exit(m.Run())
 }
