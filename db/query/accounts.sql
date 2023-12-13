@@ -2,6 +2,10 @@
 SELECT * FROM "accounts"
 WHERE id = $1 LIMIT 1;
 
+-- name: GetAccountForUpdate :one
+SELECT * FROM "accounts"
+WHERE id = $1 LIMIT 1 FOR NO KEY UPDATE;
+
 -- name: ListAccount :many
 SELECT * FROM "accounts"
 ORDER BY id
@@ -22,4 +26,10 @@ WHERE id = $1;
 UPDATE accounts
 SET balance= $2, currency= $3
 WHERE id= $1
+RETURNING *;
+
+-- name: AddAccountBalance :one
+UPDATE accounts
+SET balance= balance + sqlc.arg(amount)
+WHERE id= sqlc.arg(id)
 RETURNING *;

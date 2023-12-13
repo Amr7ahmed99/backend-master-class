@@ -11,6 +11,7 @@ import (
 )
 
 var testQueries *Queries
+var connectionDB *sql.DB
 
 func init() {
 	err := godotenv.Load("../../.env")
@@ -21,10 +22,14 @@ func init() {
 
 func TestMain(m *testing.M) {
 
-	conn, err := sql.Open(os.Getenv("DB_DRIVER_NAME"), os.Getenv("DB_DATA_SOURCE"))
+	var err error
+	connectionDB, err = sql.Open(os.Getenv("DB_DRIVER_NAME"), os.Getenv("DB_DATA_SOURCE"))
 	if err != nil {
 		log.Fatal("cannot connect to DB", err)
 	}
-	testQueries = New(conn)
+
+	defer connectionDB.Close()
+
+	testQueries = New(connectionDB)
 	os.Exit(m.Run())
 }
