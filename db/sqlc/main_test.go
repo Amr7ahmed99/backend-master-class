@@ -1,12 +1,10 @@
 package db
 
 import (
+	"backend-master-class/db/connection"
 	"database/sql"
-	"log"
 	"os"
 	"testing"
-
-	_ "github.com/lib/pq"
 )
 
 var testQueries *Queries
@@ -21,11 +19,7 @@ var connectionDB *sql.DB
 
 func TestMain(m *testing.M) {
 
-	var err error
-	connectionDB, err = sql.Open("postgres", "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable")
-	if err != nil {
-		log.Fatal("cannot connect to DB", err)
-	}
+	connectionDB = connection.Postgres()
 
 	defer connectionDB.Close()
 

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"backend-master-class/api/request_params"
 	"backend-master-class/util"
 	"context"
 	"database/sql"
@@ -80,7 +81,14 @@ func TestListAccount(t *testing.T) {
 	}
 
 	limit := 5
-	fetchedAccounts, err := testQueries.ListAccount(context.Background(), int32(limit))
+	req := request_params.ListAccountRequest{
+		PageSize: 5,
+		PageID:   1,
+	}
+	fetchedAccounts, err := testQueries.ListAccount(context.Background(), ListAccountParams{
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+	})
 	require.NoError(t, err)
 	require.Len(t, fetchedAccounts, limit)
 
