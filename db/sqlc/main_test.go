@@ -2,7 +2,9 @@ package db
 
 import (
 	"backend-master-class/db/connection"
+	"backend-master-class/util"
 	"database/sql"
+	"log"
 	"os"
 	"testing"
 )
@@ -18,8 +20,11 @@ var connectionDB *sql.DB
 // }
 
 func TestMain(m *testing.M) {
-
-	connectionDB = connection.Postgres()
+	config, err := util.LoadConfig("../..")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+	connectionDB = connection.Postgres(config.DBDriver, config.DBSource)
 
 	defer connectionDB.Close()
 

@@ -7,8 +7,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Postgres() *sql.DB {
-	connectionDB, err := sql.Open("postgres", "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable")
+func Postgres(driver string, source string) *sql.DB {
+
+	connectionDB, err := sql.Open(driver, source)
 	if err != nil {
 		log.Fatal("cannot connect to DB", err)
 	}
