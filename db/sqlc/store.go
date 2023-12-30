@@ -6,22 +6,28 @@ import (
 	"fmt"
 )
 
-//	Store provides all functions and execute db queries and transaction
-type Store struct {
+// Store provides all functions and execute db queries and transaction
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, arg TransferTxParams) (result TransferTxResult, err error)
+}
+
+// Store provides all functions and execute SQL queries and transaction
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
-//	NewStore creates a new Store
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+// NewStore creates a new Store
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
-//	execTX executes a function within a db transaction
-func (store *Store) execTX(ctx context.Context, fn func(*Queries) error) error {
+// execTX executes a function within a db transaction
+func (store *SQLStore) execTX(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -51,9 +57,9 @@ type TransferTxResult struct {
 	ToEntry     Entry    `json:"to_entry"`
 }
 
-//	TransferTx performs a money transfer from one account to the other.
-//	It creates a transfer record, adds account entries and updates accounts' balance within a single db transaction
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (result TransferTxResult, err error) {
+// TransferTx performs a money transfer from one account to the other.
+// It creates a transfer record, adds account entries and updates accounts' balance within a single db transaction
+func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (result TransferTxResult, err error) {
 	err = store.execTX(ctx, func(q *Queries) error {
 		//Create Transfer
 		result.Transfer, err = q.CreateTransfer(ctx, CreateTransferParams{
