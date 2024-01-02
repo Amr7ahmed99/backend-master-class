@@ -7,12 +7,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var ConnectionDB *sql.DB
+
 func Postgres(driver string, source string) *sql.DB {
-
-	connectionDB, err := sql.Open(driver, source)
-	if err != nil {
-		log.Fatal("cannot connect to DB", err)
+	if ConnectionDB == nil {
+		var err error
+		ConnectionDB, err = sql.Open(driver, source)
+		if err != nil {
+			log.Fatal("cannot connect to DB", err)
+		}
 	}
-
-	return connectionDB
+	return ConnectionDB
 }

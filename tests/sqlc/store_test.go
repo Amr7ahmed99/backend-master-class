@@ -1,6 +1,7 @@
-package db
+package tests
 
 import (
+	db "backend-master-class/db/sqlc"
 	"context"
 	"testing"
 
@@ -8,7 +9,7 @@ import (
 )
 
 func TestTransferTx(t *testing.T) {
-	store := NewStore(connectionDB)
+	store := db.NewStore(connectionDB)
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
 
@@ -17,11 +18,11 @@ func TestTransferTx(t *testing.T) {
 	amount := int64(10)
 
 	errs := make(chan error)
-	results := make(chan TransferTxResult)
+	results := make(chan db.TransferTxResult)
 
 	for i := 0; i < n; i++ {
 		go func() {
-			result, err := store.TransferTx(context.Background(), TransferTxParams{
+			result, err := store.TransferTx(context.Background(), db.TransferTxParams{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
@@ -108,7 +109,7 @@ func TestTransferTx(t *testing.T) {
 }
 
 func TestTransferTxDeadLock(t *testing.T) {
-	store := NewStore(connectionDB)
+	store := db.NewStore(connectionDB)
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
 
@@ -127,7 +128,7 @@ func TestTransferTxDeadLock(t *testing.T) {
 			toAccount = account1.ID
 		}
 		go func() {
-			_, err := store.TransferTx(context.Background(), TransferTxParams{
+			_, err := store.TransferTx(context.Background(), db.TransferTxParams{
 				FromAccountId: fromAccount,
 				ToAccountId:   toAccount,
 				Amount:        amount,

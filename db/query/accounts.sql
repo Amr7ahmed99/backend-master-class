@@ -14,7 +14,7 @@ OFFSET $2;
 
 -- name: CreateAccount :one
 INSERT INTO "accounts" (
-  owner, balance, currency
+  owner, balance, currency_id
 ) VALUES (
   $1, $2, $3
 ) RETURNING *;
@@ -25,7 +25,7 @@ WHERE id = $1;
 
 -- name: UpdateAccount :one
 UPDATE accounts
-SET balance= $2, currency= $3
+SET balance= $2, currency_id= $3
 WHERE id= $1
 RETURNING *;
 

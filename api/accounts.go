@@ -17,10 +17,10 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
-	account, err := server.store.CreateAccount(ctx, db.CreateAccountParams{
-		Owner:    req.Owner,
-		Balance:  0,
-		Currency: req.Currency,
+	account, err := server.Store.CreateAccount(ctx, db.CreateAccountParams{
+		Owner:      req.Owner,
+		Balance:    0,
+		CurrencyID: req.Currency,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, server.errorResponse(err))
@@ -39,7 +39,7 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
-	account, err := server.store.GetAccount(ctx, getAccountReq.ID)
+	account, err := server.Store.GetAccount(ctx, getAccountReq.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = errors.New("account doesn't exist")
@@ -63,7 +63,7 @@ func (server *Server) listAccounts(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, server.errorResponse(err))
 		return
 	}
-	accounts, err := server.store.ListAccount(ctx, db.ListAccountParams{
+	accounts, err := server.Store.ListAccount(ctx, db.ListAccountParams{
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	})
@@ -88,7 +88,7 @@ func (server *Server) updateAccount(ctx *gin.Context) {
 		return
 	}
 
-	_, err := server.store.GetAccount(ctx, req.ID)
+	_, err := server.Store.GetAccount(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = errors.New("account doesn't exist")
@@ -99,10 +99,10 @@ func (server *Server) updateAccount(ctx *gin.Context) {
 		return
 	}
 
-	updatedAccount, err := server.store.UpdateAccount(ctx, db.UpdateAccountParams{
-		ID:       req.ID,
-		Balance:  updateReq.Balance,
-		Currency: updateReq.Currency,
+	updatedAccount, err := server.Store.UpdateAccount(ctx, db.UpdateAccountParams{
+		ID:         req.ID,
+		Balance:    updateReq.Balance,
+		CurrencyID: updateReq.Currency,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, server.errorResponse(err))

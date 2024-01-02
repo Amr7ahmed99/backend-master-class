@@ -1,4 +1,4 @@
-package db
+package tests
 
 import (
 	"backend-master-class/api/request_params"
@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	db "backend-master-class/db/sqlc"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,18 +18,18 @@ func TestCreateAccount(t *testing.T) {
 	createRandomAccount(t)
 }
 
-func createRandomAccount(t *testing.T) Account {
-	arg := CreateAccountParams{
-		Owner:    util.RandomOwner(),
-		Balance:  util.RandomMoney(),
-		Currency: util.RandomCurrency(),
+func createRandomAccount(t *testing.T) db.Account {
+	arg := db.CreateAccountParams{
+		Owner:      util.RandomOwner(),
+		Balance:    util.RandomMoney(),
+		CurrencyID: int32(util.RandomCurrency()),
 	}
 	account, err := testQueries.CreateAccount(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account)
 	require.Equal(t, arg.Owner, account.Owner)
 	require.Equal(t, arg.Balance, account.Balance)
-	require.Equal(t, arg.Currency, account.Currency)
+	require.Equal(t, arg.CurrencyID, account.CurrencyID)
 	require.NotZero(t, account.ID)
 	require.NotZero(t, account.CreatedAt)
 
@@ -49,10 +51,10 @@ func TestGetAccount(t *testing.T) {
 
 func TestUpdateAccount(t *testing.T) {
 	createdAccount := createRandomAccount(t)
-	arg := UpdateAccountParams{
-		ID:       createdAccount.ID,
-		Balance:  util.RandomMoney(),
-		Currency: util.RandomCurrency(),
+	arg := db.UpdateAccountParams{
+		ID:         createdAccount.ID,
+		Balance:    util.RandomMoney(),
+		CurrencyID: int32(util.RandomCurrency()),
 	}
 	updatedAccount, err := testQueries.UpdateAccount(context.Background(), arg)
 	require.NoError(t, err)
@@ -61,7 +63,7 @@ func TestUpdateAccount(t *testing.T) {
 	require.False(t, reflect.DeepEqual(createdAccount, updatedAccount))
 	require.Equal(t, arg.ID, updatedAccount.ID)
 	require.Equal(t, arg.Balance, updatedAccount.Balance)
-	require.Equal(t, arg.Currency, updatedAccount.Currency)
+	require.Equal(t, arg.CurrencyID, updatedAccount.CurrencyID)
 }
 
 func TestDeleteAccount(t *testing.T) {
@@ -85,7 +87,7 @@ func TestListAccount(t *testing.T) {
 		PageSize: 5,
 		PageID:   1,
 	}
-	fetchedAccounts, err := testQueries.ListAccount(context.Background(), ListAccountParams{
+	fetchedAccounts, err := testQueries.ListAccount(context.Background(), db.ListAccountParams{
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	})

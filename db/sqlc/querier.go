@@ -18,9 +18,11 @@ type Querier interface {
 	DeleteTransfer(ctx context.Context, id int64) error
 	GetAccount(ctx context.Context, id int64) (Account, error)
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
+	GetCurrency(ctx context.Context, id int64) (Currency, error)
 	GetEntry(ctx context.Context, id int64) (Entry, error)
 	GetTransfer(ctx context.Context, id int64) (Transfer, error)
 	ListAccount(ctx context.Context, arg ListAccountParams) ([]Account, error)
+	ListCurrencies(ctx context.Context) ([]Currency, error)
 	ListEntries(ctx context.Context, limit int32) ([]Entry, error)
 	ListTransfers(ctx context.Context, limit int32) ([]Transfer, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)

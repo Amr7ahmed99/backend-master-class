@@ -1,7 +1,8 @@
-package db
+package tests
 
 import (
 	"backend-master-class/db/connection"
+	db "backend-master-class/db/sqlc"
 	"backend-master-class/util"
 	"database/sql"
 	"log"
@@ -9,7 +10,7 @@ import (
 	"testing"
 )
 
-var testQueries *Queries
+var testQueries *db.Queries
 var connectionDB *sql.DB
 
 // func init() {
@@ -28,6 +29,6 @@ func TestMain(m *testing.M) {
 
 	defer connectionDB.Close()
 
-	testQueries = New(connectionDB)
+	testQueries = db.New(connectionDB)
 	os.Exit(m.Run())
 }
