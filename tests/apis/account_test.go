@@ -1,6 +1,7 @@
-package api
+package tests
 
 import (
+	server "backend-master-class/api"
 	mockdb "backend-master-class/db/mock"
 	db "backend-master-class/db/sqlc"
 	"backend-master-class/util"
@@ -74,13 +75,13 @@ func TestGetAccount(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start test server and send request
-			server := NewServer(store)
+			newServer := server.NewServer(store)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/accounts/%d", account.ID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
-			server.router.ServeHTTP(recorder, request)
+			newServer.Router.ServeHTTP(recorder, request)
 			// check response
 			tc.checkResponse(t, recorder)
 		})
@@ -90,10 +91,10 @@ func TestGetAccount(t *testing.T) {
 
 func randomAccount() db.Account {
 	return db.Account{
-		ID:       util.RandomInt(1, 1000),
-		Owner:    util.RandomOwner(),
-		Balance:  util.RandomMoney(),
-		Currency: util.RandomCurrency(),
+		ID:         util.RandomInt(1, 1000),
+		Owner:      util.RandomOwner(),
+		Balance:    util.RandomMoney(),
+		CurrencyID: int32(util.RandomCurrency()),
 	}
 }
 

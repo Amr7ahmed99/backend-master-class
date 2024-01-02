@@ -18,6 +18,16 @@ type MockStore struct {
 	recorder *MockStoreMockRecorder
 }
 
+// GetCurrency implements db.Store.
+func (*MockStore) GetCurrency(ctx context.Context, id int64) (db.Currency, error) {
+	panic("unimplemented")
+}
+
+// ListCurrencies implements db.Store.
+func (*MockStore) ListCurrencies(ctx context.Context) ([]db.Currency, error) {
+	panic("unimplemented")
+}
+
 // MockStoreMockRecorder is the mock recorder for MockStore.
 type MockStoreMockRecorder struct {
 	mock *MockStore

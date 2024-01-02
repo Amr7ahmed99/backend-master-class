@@ -13,9 +13,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func main() {
-	var connectionDB *sql.DB
-	config, err := util.LoadConfig(".")
+var connectionDB *sql.DB
+var config *util.Config
+
+func init() {
+	var err error
+	config, err = util.LoadConfig(".")
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			log.Fatal("Config file not found:", err)
@@ -24,6 +27,9 @@ func main() {
 		}
 	}
 	connectionDB = connection.Postgres(config.DBDriver, config.DBSource)
+}
+
+func main() {
 	store := db.NewStore(connectionDB)
 	server := api.NewServer(store)
 	if err := server.Start(config.ServerAddress); err != nil {

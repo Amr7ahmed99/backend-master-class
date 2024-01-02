@@ -51,6 +51,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getAccountForUpdateStmt, err = db.PrepareContext(ctx, getAccountForUpdate); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAccountForUpdate: %w", err)
 	}
+	if q.getCurrencyStmt, err = db.PrepareContext(ctx, getCurrency); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCurrency: %w", err)
+	}
 	if q.getEntryStmt, err = db.PrepareContext(ctx, getEntry); err != nil {
 		return nil, fmt.Errorf("error preparing query GetEntry: %w", err)
 	}
@@ -59,6 +62,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.listAccountStmt, err = db.PrepareContext(ctx, listAccount); err != nil {
 		return nil, fmt.Errorf("error preparing query ListAccount: %w", err)
+	}
+	if q.listCurrenciesStmt, err = db.PrepareContext(ctx, listCurrencies); err != nil {
+		return nil, fmt.Errorf("error preparing query ListCurrencies: %w", err)
 	}
 	if q.listEntriesStmt, err = db.PrepareContext(ctx, listEntries); err != nil {
 		return nil, fmt.Errorf("error preparing query ListEntries: %w", err)
@@ -125,6 +131,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getAccountForUpdateStmt: %w", cerr)
 		}
 	}
+	if q.getCurrencyStmt != nil {
+		if cerr := q.getCurrencyStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCurrencyStmt: %w", cerr)
+		}
+	}
 	if q.getEntryStmt != nil {
 		if cerr := q.getEntryStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getEntryStmt: %w", cerr)
@@ -138,6 +149,11 @@ func (q *Queries) Close() error {
 	if q.listAccountStmt != nil {
 		if cerr := q.listAccountStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listAccountStmt: %w", cerr)
+		}
+	}
+	if q.listCurrenciesStmt != nil {
+		if cerr := q.listCurrenciesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listCurrenciesStmt: %w", cerr)
 		}
 	}
 	if q.listEntriesStmt != nil {
@@ -213,9 +229,11 @@ type Queries struct {
 	deleteTransferStmt      *sql.Stmt
 	getAccountStmt          *sql.Stmt
 	getAccountForUpdateStmt *sql.Stmt
+	getCurrencyStmt         *sql.Stmt
 	getEntryStmt            *sql.Stmt
 	getTransferStmt         *sql.Stmt
 	listAccountStmt         *sql.Stmt
+	listCurrenciesStmt      *sql.Stmt
 	listEntriesStmt         *sql.Stmt
 	listTransfersStmt       *sql.Stmt
 	updateAccountStmt       *sql.Stmt
@@ -236,9 +254,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteTransferStmt:      q.deleteTransferStmt,
 		getAccountStmt:          q.getAccountStmt,
 		getAccountForUpdateStmt: q.getAccountForUpdateStmt,
+		getCurrencyStmt:         q.getCurrencyStmt,
 		getEntryStmt:            q.getEntryStmt,
 		getTransferStmt:         q.getTransferStmt,
 		listAccountStmt:         q.listAccountStmt,
+		listCurrenciesStmt:      q.listCurrenciesStmt,
 		listEntriesStmt:         q.listEntriesStmt,
 		listTransfersStmt:       q.listTransfersStmt,
 		updateAccountStmt:       q.updateAccountStmt,
