@@ -2,6 +2,7 @@ package util
 
 import (
 	"backend-master-class/enums"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -44,4 +45,8 @@ func RandomCurrency() int {
 	currency := []int{enums.EGP, enums.EUR, enums.USD}
 	currencyCount := int64(len(currency))
 	return currency[RandomInt(0, currencyCount)]
+}
+
+func RandomEmail() string {
+	return fmt.Sprintf("%s.email.com", RandomString(6))
 }

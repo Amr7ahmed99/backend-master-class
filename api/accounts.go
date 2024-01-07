@@ -3,11 +3,13 @@ package api
 import (
 	. "backend-master-class/api/request_params"
 	db "backend-master-class/db/sqlc"
+	"backend-master-class/enums"
 	"database/sql"
 	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 func (server *Server) createAccount(ctx *gin.Context) {
@@ -23,6 +25,13 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		CurrencyID: req.Currency,
 	})
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case enums.FOREIGN_KEY_VIOLATION, enums.UNIQUE_VIOLATION:
+				ctx.JSON(http.StatusForbidden, server.errorResponse(err))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, server.errorResponse(err))
 		return
 	}
