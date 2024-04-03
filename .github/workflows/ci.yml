@@ -39,7 +39,13 @@ jobs:
 
     - name: Install viper for configurations
       run: go get "github.com/spf13/viper"
-      
+    
+    - name: Install jwt for creating and verifying token
+      run: go get "github.com/dgrijalva/jwt-go"
+    
+    - name: Install uuid for generating random id
+      run: go get "github.com/google/uuid"
+
     - name: Install golang-migrate
       run: |
         curl -L https://github.com/golang-migrate/migrate/releases/download/v4.12.2/migrate.linux-amd64.tar.gz | tar xvz
