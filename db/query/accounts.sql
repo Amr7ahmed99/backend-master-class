@@ -9,12 +9,11 @@ WHERE id = $1 LIMIT 1 FOR NO KEY UPDATE;
 -- name: ListAccount :many
 SELECT * FROM "accounts"
 ORDER BY id
-LIMIT $1
-OFFSET $2;
+LIMIT $1;
 
 -- name: CreateAccount :one
 INSERT INTO "accounts" (
-  owner, balance, currency_id
+  owner, balance, currency
 ) VALUES (
   $1, $2, $3
 ) RETURNING *;
@@ -25,7 +24,7 @@ WHERE id = $1;
 
 -- name: UpdateAccount :one
 UPDATE accounts
-SET balance= $2, currency_id= $3
+SET balance= $2, currency= $3
 WHERE id= $1
 RETURNING *;
 

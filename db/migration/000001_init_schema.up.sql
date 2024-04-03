@@ -2,7 +2,7 @@ CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
   "owner" varchar NOT NULL,
   "balance" bigint NOT NULL,
-  "currency_id" int NOT NULL,
+  "currency" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
@@ -22,15 +22,6 @@ CREATE TABLE "transfers" (
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "currencies" (
-  "id" bigserial PRIMARY KEY,
-  "currency" varchar NOT NULL
-);
-
-INSERT INTO currencies (id, currency) 
-VALUES(1, 'EGP'), (2, 'USD'), (3, 'EUR');
-
-
 CREATE INDEX ON "accounts" ("owner");
 
 CREATE INDEX ON "entries" ("account_id");
@@ -43,10 +34,8 @@ CREATE INDEX ON "transfers" ("from_account_id", "to_account_id");
 
 COMMENT ON COLUMN "entries"."amount" IS 'can be negative or positive';
 
-ALTER TABLE "entries" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE SET NULL;
+ALTER TABLE "entries" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
 
-ALTER TABLE "transfers" ADD FOREIGN KEY ("from_account_id") REFERENCES "accounts" ("id") ON DELETE SET NULL;
+ALTER TABLE "transfers" ADD FOREIGN KEY ("from_account_id") REFERENCES "accounts" ("id");
 
-ALTER TABLE "transfers" ADD FOREIGN KEY ("to_account_id") REFERENCES "accounts" ("id") ON DELETE SET NULL;
-
-ALTER TABLE "accounts" ADD FOREIGN KEY ("currency_id") REFERENCES "currencies" ("id") ON DELETE SET NULL;
+ALTER TABLE "transfers" ADD FOREIGN KEY ("to_account_id") REFERENCES "accounts" ("id");
