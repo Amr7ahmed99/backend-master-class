@@ -54,3 +54,4 @@ jobs:
 
     - name: Test with the Go CLI
       run: make test
+
