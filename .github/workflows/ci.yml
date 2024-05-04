@@ -40,8 +40,11 @@ jobs:
     - name: Install viper for configurations
       run: go get "github.com/spf13/viper"
     
-    - name: Install jwt for creating and verifying token
+    - name: Install JWT for creating and verifying token
       run: go get "github.com/dgrijalva/jwt-go"
+    
+    - name: Install PASETO for creating and verifying token
+      run: go get "github.com/o1egl/paseto"
     
     - name: Install uuid for generating random id
       run: go get "github.com/google/uuid"
