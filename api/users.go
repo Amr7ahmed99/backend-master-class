@@ -2,6 +2,7 @@ package api
 
 import (
 	. "backend-master-class/api/request_params"
+	"backend-master-class/api/responses"
 	db "backend-master-class/db/sqlc"
 	"backend-master-class/enums"
 	"backend-master-class/util"
@@ -84,4 +85,42 @@ func (server *Server) listUsers(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, users)
+}
+
+func (server *Server) loginUser(ctx *gin.Context) {
+	var req *LoginUserRequest
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, server.errorResponse(err))
+		return
+	}
+
+	user, err := server.Store.GetUser(ctx, req.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, server.errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, server.errorResponse(err))
+		return
+	}
+
+	err = util.CheckPassword(req.Password, user.HashedPassword)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, server.errorResponse(err))
+		return
+	}
+
+	accessToken, err := server.TokenMaker.CreateToken(req.Username, server.Config.AccessTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, server.errorResponse(err))
+		return
+	}
+
+	res := responses.LoginUserResponse{
+		AccessToken: accessToken,
+		User:        user,
+	}
+
+	ctx.JSON(http.StatusOK, res)
 }
