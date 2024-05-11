@@ -1,7 +1,6 @@
 package tests
 
 import (
-	server "backend-master-class/api"
 	mockdb "backend-master-class/db/mock"
 	db "backend-master-class/db/sqlc"
 	"backend-master-class/util"
@@ -75,7 +74,7 @@ func TestGetAccount(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start test server and send request
-			newServer := server.NewServer(store)
+			newServer := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/accounts/%d", account.ID)

@@ -14,7 +14,7 @@ import (
 )
 
 var connectionDB *sql.DB
-var config *util.Config
+var config util.Config
 
 func init() {
 	var err error
@@ -31,8 +31,12 @@ func init() {
 
 func main() {
 	store := db.NewStore(connectionDB)
-	server := api.NewServer(store)
-	if err := server.Start(config.ServerAddress); err != nil {
+	server, err := api.NewServer(config, store)
+	if err != nil {
+		log.Fatal("cannot start the server:", err)
+	}
+
+	if err = server.Start(config.ServerAddress); err != nil {
 		log.Fatal("can not start server:", err)
 	}
 }
