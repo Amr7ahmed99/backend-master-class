@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"backend-master-class/api/request_params"
+	request_params "backend-master-class/apis/requests"
 	"backend-master-class/util"
 	"context"
 	"database/sql"

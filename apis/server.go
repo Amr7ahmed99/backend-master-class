@@ -1,4 +1,4 @@
-package api
+package apis
 
 import (
 	db "backend-master-class/db/sqlc"
