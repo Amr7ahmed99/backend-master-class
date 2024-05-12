@@ -1,4 +1,4 @@
-package request_params
+package requests
 
 type LoginUserRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`

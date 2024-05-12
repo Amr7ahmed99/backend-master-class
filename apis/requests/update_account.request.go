@@ -1,4 +1,4 @@
-package request_params
+package requests
 
 type UpdateAccountRequest struct {
 	Balance  int64 `json:"balance" binding:"required"`
