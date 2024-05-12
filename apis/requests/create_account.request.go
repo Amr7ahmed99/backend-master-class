@@ -1,4 +1,4 @@
-package request_params
+package requests
 
 type CreateAccountRequest struct {
 	Owner    string `json:"owner" binding:"required"`

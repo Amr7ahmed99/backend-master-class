@@ -1,4 +1,4 @@
-package request_params
+package requests
 
 type CreateTransferRequest struct {
 	Amount      int64 `json:"amount" binding:"required,gt=0"`
