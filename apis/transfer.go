@@ -1,7 +1,7 @@
-package api
+package apis
 
 import (
-	. "backend-master-class/api/request_params"
+	. "backend-master-class/apis/requests"
 	db "backend-master-class/db/sqlc"
 	"database/sql"
 	"fmt"

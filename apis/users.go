@@ -1,8 +1,8 @@
-package api
+package apis
 
 import (
-	. "backend-master-class/api/request_params"
-	"backend-master-class/api/responses"
+	. "backend-master-class/apis/requests"
+	"backend-master-class/apis/responses"
 	db "backend-master-class/db/sqlc"
 	"backend-master-class/enums"
 	"backend-master-class/util"

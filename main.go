@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend-master-class/api"
+	"backend-master-class/apis"
 	"backend-master-class/db/connection"
 	db "backend-master-class/db/sqlc"
 	"backend-master-class/util"
@@ -31,7 +31,7 @@ func init() {
 
 func main() {
 	store := db.NewStore(connectionDB)
-	server, err := api.NewServer(config, store)
+	server, err := apis.NewServer(config, store)
 	if err != nil {
 		log.Fatal("cannot start the server:", err)
 	}
