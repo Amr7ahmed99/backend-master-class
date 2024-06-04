@@ -105,7 +105,6 @@ func TestTransferTx(t *testing.T) {
 	updatedToAccount, err := store.GetAccount(context.Background(), account2.ID)
 	require.NoError(t, err)
 	require.Equal(t, account2.Balance+amount*int64(n), updatedToAccount.Balance)
-
 }
 
 func TestTransferTxDeadLock(t *testing.T) {
@@ -149,5 +148,4 @@ func TestTransferTxDeadLock(t *testing.T) {
 	updatedToAccount, err := store.GetAccount(context.Background(), account2.ID)
 	require.NoError(t, err)
 	require.Equal(t, account2.Balance, updatedToAccount.Balance)
-
 }

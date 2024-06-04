@@ -14,10 +14,10 @@ import (
 )
 
 func TestCreateUp(t *testing.T) {
-	createRandomUser(t)
+	CreateRandomUser(t)
 }
 
-func createRandomUser(t *testing.T) db.User {
+func CreateRandomUser(t *testing.T) db.User {
 	hashedPassword, err := util.HashPassword(util.RandomString(6))
 	require.NoError(t, err)
 	require.NotEmpty(t, hashedPassword)
@@ -42,7 +42,7 @@ func createRandomUser(t *testing.T) db.User {
 }
 
 func TestGetUser(t *testing.T) {
-	createdUser := createRandomUser(t)
+	createdUser := CreateRandomUser(t)
 	fetchedUser, err := testQueries.GetUser(context.Background(), createdUser.Username)
 	require.NoError(t, err)
 	require.NotEmpty(t, fetchedUser)
@@ -56,7 +56,7 @@ func TestGetUser(t *testing.T) {
 
 func TestListUser(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		createRandomUser(t)
+		CreateRandomUser(t)
 	}
 
 	limit := 5

@@ -3,7 +3,9 @@ package apis
 import (
 	. "backend-master-class/apis/requests"
 	db "backend-master-class/db/sqlc"
+	"backend-master-class/token"
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -17,11 +19,21 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 		return
 	}
 
-	if match := server.isValidAccount(ctx, req.FromAccount, req.Currency); !match {
+	authPayload := ctx.MustGet(AUTHORIZATION_PAYLOAD).(*token.Payload)
+
+	fromAccount, misMatch := server.isValidAccount(ctx, req.FromAccount, req.Currency)
+	if misMatch {
 		return
 	}
 
-	if match := server.isValidAccount(ctx, req.ToAccount, req.Currency); !match {
+	if fromAccount.Owner != authPayload.Username {
+		err := errors.New("from account doesn't belong to authenticated user")
+		ctx.JSON(http.StatusUnauthorized, server.errorResponse(err))
+		return
+	}
+
+	_, misMatch = server.isValidAccount(ctx, req.ToAccount, req.Currency)
+	if misMatch {
 		return
 	}
 
@@ -38,7 +50,7 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-func (server *Server) isValidAccount(ctx *gin.Context, accountId int64, currency int32) bool {
+func (server *Server) isValidAccount(ctx *gin.Context, accountId int64, currency int32) (db.Account, bool) {
 	account, err := server.Store.GetAccount(ctx, accountId)
 	fmt.Println(currency, accountId)
 	if err != nil {
@@ -47,13 +59,13 @@ func (server *Server) isValidAccount(ctx *gin.Context, accountId int64, currency
 			status = http.StatusNotFound
 		}
 		ctx.JSON(status, server.errorResponse(err))
-		return false
+		return account, false
 	}
 	if account.CurrencyID != currency {
 		err := fmt.Errorf("account [%d] currency mismatch: %d vs %d", accountId, account.CurrencyID, currency)
 		ctx.JSON(http.StatusBadRequest, server.errorResponse(err))
-		return false
+		return account, false
 	}
 
-	return true
+	return account, true
 }
