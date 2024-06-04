@@ -1,7 +1,7 @@
 package enums
 
 const (
-	EGP int = 1
-	USD int = 2
-	EUR int = 3
+	EGP int32 = 1
+	USD int32 = 2
+	EUR int32 = 3
 )

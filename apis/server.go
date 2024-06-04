@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"backend-master-class/apis/middlewares"
 	db "backend-master-class/db/sqlc"
 	"backend-master-class/token"
 	"backend-master-class/util"
@@ -43,23 +44,28 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+	authRoutes := router.Group("/")
+	{
+		authRoutes.Use(middlewares.AuthMiddleware(server.TokenMaker))
 
-	router.POST("/accounts", server.createAccount)
-	router.GET("/accounts/:id", server.getAccount)
-	router.GET("/accounts", server.listAccounts)
-	router.PUT("/accounts/:id", server.updateAccount)
+		authRoutes.POST("/accounts", server.createAccount)
+		authRoutes.GET("/accounts/:id", server.getAccount)
+		authRoutes.GET("/accounts", server.listAccounts)
+		authRoutes.PUT("/accounts/:id", server.updateAccount)
 
-	router.POST("/transfers", server.createTransfer)
+		authRoutes.POST("/transfers", server.createTransfer)
+
+		authRoutes.GET("/users", server.listUsers)
+		authRoutes.GET("/users/:username", server.getUser)
+	}
 
 	router.POST("/users", server.createUser)
-	router.GET("/users/:username", server.getUser)
-	router.GET("/users", server.listUsers)
 	router.POST("/users/login", server.loginUser)
 
 	server.Router = router
 }
 
-// Start runs the HTTP server on a specific address.
+// Start runs the HTTP server on a specific address
 func (server *Server) Start(address string) error {
 	return server.Router.Run(address)
 }

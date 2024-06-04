@@ -4,12 +4,17 @@ import (
 	. "backend-master-class/apis/requests"
 	db "backend-master-class/db/sqlc"
 	"backend-master-class/enums"
+	"backend-master-class/token"
 	"database/sql"
 	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
+)
+
+const (
+	AUTHORIZATION_PAYLOAD = "authorization_payload"
 )
 
 func (server *Server) createAccount(ctx *gin.Context) {
@@ -19,8 +24,9 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(AUTHORIZATION_PAYLOAD).(*token.Payload)
 	account, err := server.Store.CreateAccount(ctx, db.CreateAccountParams{
-		Owner:      req.Owner,
+		Owner:      authPayload.Username,
 		Balance:    0,
 		CurrencyID: req.Currency,
 	})
@@ -58,7 +64,12 @@ func (server *Server) getAccount(ctx *gin.Context) {
 
 		ctx.JSON(http.StatusInternalServerError, server.errorResponse(err))
 		return
+	}
 
+	authPayload := ctx.MustGet(AUTHORIZATION_PAYLOAD).(*token.Payload)
+	if account.Owner != authPayload.Username {
+		err := errors.New("account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, server.errorResponse(err))
 	}
 	ctx.JSON(http.StatusOK, account)
 }
@@ -72,7 +83,10 @@ func (server *Server) listAccounts(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, server.errorResponse(err))
 		return
 	}
-	accounts, err := server.Store.ListAccount(ctx, db.ListAccountParams{
+
+	authPayload := ctx.MustGet(AUTHORIZATION_PAYLOAD).(*token.Payload)
+	accounts, err := server.Store.ListAccounts(ctx, db.ListAccountsParams{
+		Owner:  authPayload.Username,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	})
@@ -97,7 +111,8 @@ func (server *Server) updateAccount(ctx *gin.Context) {
 		return
 	}
 
-	_, err := server.Store.GetAccount(ctx, req.ID)
+	authPayload := ctx.MustGet(AUTHORIZATION_PAYLOAD).(*token.Payload)
+	account, err := server.Store.GetAccount(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = errors.New("account doesn't exist")
@@ -105,6 +120,12 @@ func (server *Server) updateAccount(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, server.errorResponse(err))
+		return
+	}
+
+	if account.Owner != authPayload.Username {
+		err = errors.New("account doesn't belong to authenticated user")
+		ctx.JSON(http.StatusUnauthorized, server.errorResponse(err))
 		return
 	}
 

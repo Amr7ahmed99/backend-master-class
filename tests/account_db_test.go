@@ -19,7 +19,7 @@ func TestCreateAccount(t *testing.T) {
 }
 
 func createRandomAccount(t *testing.T) db.Account {
-	user := createRandomUser(t)
+	user := CreateRandomUser(t)
 	arg := db.CreateAccountParams{
 		Owner:      user.Username,
 		Balance:    util.RandomMoney(),
@@ -37,7 +37,7 @@ func createRandomAccount(t *testing.T) db.Account {
 	return account
 }
 
-func TestGetAccount(t *testing.T) {
+func TestGetAccountDB(t *testing.T) {
 	createdAccount := createRandomAccount(t)
 	fetchedAccount, err := testQueries.GetAccount(context.Background(), createdAccount.ID)
 	require.NoError(t, err)
@@ -50,7 +50,7 @@ func TestGetAccount(t *testing.T) {
 	require.True(t, reflect.DeepEqual(createdAccount, fetchedAccount))
 }
 
-func TestUpdateAccount(t *testing.T) {
+func TestUpdateAccountDB(t *testing.T) {
 	createdAccount := createRandomAccount(t)
 	arg := db.UpdateAccountParams{
 		ID:         createdAccount.ID,
@@ -67,7 +67,7 @@ func TestUpdateAccount(t *testing.T) {
 	require.Equal(t, arg.CurrencyID, updatedAccount.CurrencyID)
 }
 
-func TestDeleteAccount(t *testing.T) {
+func TestDeleteAccountDB(t *testing.T) {
 	createdAccount := createRandomAccount(t)
 	err := testQueries.DeleteAccount(context.Background(), createdAccount.ID)
 	require.NoError(t, err)
@@ -78,22 +78,25 @@ func TestDeleteAccount(t *testing.T) {
 	require.Empty(t, fetchedAccount)
 }
 
-func TestListAccount(t *testing.T) {
+func TestListAccountDB(t *testing.T) {
+	var lastAccount db.Account
 	for i := 0; i < 10; i++ {
-		createRandomAccount(t)
+		lastAccount = createRandomAccount(t)
 	}
 
-	limit := 5
+	limit := 1
 	req := request_params.ListAccountRequest{
 		PageSize: 5,
 		PageID:   1,
 	}
-	fetchedAccounts, err := testQueries.ListAccount(context.Background(), db.ListAccountParams{
+	fetchedAccounts, err := testQueries.ListAccounts(context.Background(), db.ListAccountsParams{
+		Owner:  lastAccount.Owner,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	})
 	require.NoError(t, err)
-	require.Len(t, fetchedAccounts, limit)
+	require.NotEmpty(t, fetchedAccounts)
+	require.GreaterOrEqual(t, len(fetchedAccounts), limit)
 
 	for _, value := range fetchedAccounts {
 		require.NotEmpty(t, value)

@@ -41,10 +41,11 @@ func RandomMoney() int64 {
 }
 
 // RandomCurrency generates random currency code
-func RandomCurrency() int {
-	currency := []int{enums.EGP, enums.EUR, enums.USD}
-	currencyCount := int64(len(currency))
-	return currency[RandomInt(0, currencyCount)]
+func RandomCurrency() int32 {
+	currency := []int32{enums.EGP, enums.EUR, enums.USD}
+	currencyCount := int32(len(currency))
+	randIdx := 0 + rand.Int31n(currencyCount-1)
+	return currency[randIdx]
 }
 
 func RandomEmail() string {
