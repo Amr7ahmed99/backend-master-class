@@ -55,9 +55,6 @@ jobs:
         sudo mv migrate.linux-amd64 /usr/bin/migrate
         which migrate
 
-    - name: Run postgres12
-      run: make postgres
-
     - name: Run migrations
       run: make migrateup
       
