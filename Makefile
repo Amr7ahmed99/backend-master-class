@@ -1,5 +1,5 @@
 postgres:
-	docker run --name posqlDB -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
+	docker run --name postgres12 --network bank-network -p 5430:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
 
 localpsql_createdb:
 	PGPASSWORD=123456789 psql -U postgres -p 5432 -c "create database simple_bank;"
@@ -8,10 +8,10 @@ localpsql_dropdb:
 	PGPASSWORD=123456789 psql -U postgres -p 5432 -c "drop database simple_bank;"
 
 createdb:
-	docker exec -it posqlDB createdb --username=root --owner=root simple_bank
+	docker exec -it postgres12 createdb --username=root --owner=root simple_bank
 
 dropdb:
-	docker exec -it posqlDB dropdb simple_bank
+	docker exec -it postgres12 dropdb simple_bank
 
 localpsql_migrateup:
 	migrate -path db/migration -database "postgresql://postgres:123456789@localhost:5432/simple_bank?sslmode=disable" -verbose up
@@ -20,16 +20,16 @@ localpsql_migratedown:
 	migrate -path db/migration -database "postgresql://postgres:123456789@localhost:5432/simple_bank?sslmode=disable" -verbose down
 
 migrateup:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5430/simple_bank?sslmode=disable" -verbose up
 
 migrateup1:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up 1
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5430/simple_bank?sslmode=disable" -verbose up 1
 
 migratedown:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5430/simple_bank?sslmode=disable" -verbose down
 
 migratedown1:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down 1
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5430/simple_bank?sslmode=disable" -verbose down 1
 
 sqlc:
 	sqlc generate
